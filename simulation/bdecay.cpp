@@ -28,7 +28,7 @@ const int Z_2 = 7;	// Atomic number of final nucleus
 const double m_2 = 14.0030740052;	// Isotope mass (in atomic mass  units)
 
 // Other parameters
-const int nevents = 1e6;// Number of events to generate
+const int nevents = 1e5;// Number of events to generate
 const float h = 10;	// Constant used for Von Neuman method. Should range about [1,10]. Too low => cutting distribution, Too high => execution takes too long. Used to estimate the maximum of N(T_e)
 int ndivisions = 50;	// Number of divisions in energy histograms
 ////////////////// End Of Parameters ///////////////
@@ -70,7 +70,7 @@ void bdecay(){
 	TRandom3 *rand = new TRandom3();	// Generate a random number generator for TRandom3
 
 	// ROOT Histograms
-	TH1D *E_e = new TH1D("E_e", ";E_{e} [MeV];Intensity", ndivisions, 0, 1.1*Q);	// Energy histogram for electron
+	TH1D *E_e = new TH1D("E_{e}", ";E_{e} [MeV];Intensity", ndivisions, 0, 1.1*Q);	// Energy histogram for electron
 
 	// ROOT rootfile (will contain all histograms)
 	TFile *rootfile = new TFile("beta_decay_histograms.root", "recreate");
