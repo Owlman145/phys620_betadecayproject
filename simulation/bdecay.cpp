@@ -20,17 +20,18 @@ using namespace std;
 
 ////////////////// Parameters ///////////////////////
 // Initial nucleus
-const int Z_1 = 6;	// Atomic number of initial nucleus
-const double m_1 = 14.003241;	// Isotope mass (in atomic mass units) 
+const int Z_1 = 1;	// Atomic number of initial nucleus (3H)
+const double m_1 = 3.0160492;	// Isotope mass (in atomic mass units) 
 
 // Final nucleus
-const int Z_2 = 7;	// Atomic number of final nucleus
-const double m_2 = 14.0030740052;	// Isotope mass (in atomic mass  units)
+const int Z_2 = 2;	// Atomic number of final nucleus (3He)
+const double m_2 = 3.0160293;	// Isotope mass (in atomic mass  units)
 
 // Other parameters
 const int nevents = 1e5;// Number of events to generate
 const float h = 10;	// Constant used for Von Neuman method. Should range about [1,10]. Too low => cutting distribution, Too high => execution takes too long. Used to estimate the maximum of N(T_e)
-int ndivisions = 50;	// Number of divisions in energy histograms
+float limit=0;	// Multiple of Q over which we necessitate the energy to be
+const int ndivisions = 100;	// Number of divisions in energy histograms
 ////////////////// End Of Parameters ///////////////
 
 // Physical Constants
@@ -44,7 +45,6 @@ const float m_nu= 0.2e-6;	// Mass (in MEV) of neutrino. Value was given in our p
 // Functions
 float N(float, int, float);		// Distribution of energy, N(T_e)
 float F(int, float, int);	// Fermi function, F(Z',T_e)
-float m(float, float);	// Semi-empirical mass formula (Bertulani eq 5.8)
 
 // Main program
 void bdecay(){
@@ -63,14 +63,15 @@ void bdecay(){
 	{
 		break;
 	}
+	limit= limit*Q;	// Limit above which we want our spectrum
 
 	gStyle->SetOptStat("nemr");	// Makes statistics box appear automatically in histograms
 
 	// ROOT random number generator
-	TRandom3 *rand = new TRandom3();	// Generate a random number generator for TRandom3
+	TRandom3 *rand = new TRandom3(time(0));	// Generate a random number generator for TRandom3
 
 	// ROOT Histograms
-	TH1D *E_e = new TH1D("E_{e}", ";E_{e} [MeV];Intensity", ndivisions, 0, 1.1*Q);	// Energy histogram for electron
+	TH1D *E_e = new TH1D("E_{e}", ";E_{e} [MeV];Intensity", ndivisions, limit, Q);	// Energy histogram for electron
 
 	// ROOT rootfile (will contain all histograms)
 	TFile *rootfile = new TFile("beta_decay_histograms.root", "recreate");
@@ -81,7 +82,7 @@ void bdecay(){
 	int counter=0;	// Counter for the while loop
 	while (counter < nevents) {
 		// We use Von Neumann acceptance-rejection method, see phys620 course notes (Monte Carlo p. 21)
-		double T_e = rand->Uniform(Q);	// Number between 0 and Q, as there is no energy above Q
+		double T_e = rand->Uniform(limit,Q);	// Number between 0 and Q, as there is no energy above Q
 		double u = rand->Uniform(1);	// Number between 0 and 1
 		if (u <= N(T_e, charge, Q) / (h*N(Q/2, charge, Q)))	// "h" is a factor that can be changed so that the sample is more efficient. See phys620 course notes (Monte Carlo p. 21)
 		{
@@ -111,21 +112,4 @@ float F(int Z_2, float T_e, int charge)
 {
 	float eta = (T_e + m_e) * charge * alpha * Z_1 / sqrt(2*T_e*m_e);	// Taken from https://en.wikipedia.org/wiki/Beta_decay#Fermi_function
 	return 2. * Pi * eta / (1 - exp(-2*Pi*eta)); // Taken from https://en.wikipedia.org/wiki/Beta_decay#Fermi_function
-}
-
-// Semi-empirical mass formula (Bertulani eq 5.8). Returns mass in MeV
-float m(float Z, float A)
-{
-	// Constants (in MeV) for binding energy B. Taken from Bertulani, eq 5.9
-	float a_v = 15.85;
-	float a_s = 18.34;
-	float a_c = 0.71;
-	float a_a = 92.86;
-	float a_p = 1.46;
-
-	// Binding energy formula, taken from Bertulani eq 5.8
-	float B = a_v*A - a_s*pow(1.*A, 2./3.) - a_c*pow(Z,2)*pow(1.*A,-1./3.) - a_a*pow(Z-1.*A/2.,2)/A - 0.5*(pow(-1,Z)+pow(-1,A-Z))*a_p*pow(1.*A,-1./2);
-
-	return Z*m_p + (A-Z)*m_n - B;	// From Bertulani, eq 4.9
-	
 }
