@@ -63,8 +63,8 @@ void bdecay(){
 	// ROOT fit function
 	TF1 *func = new TF1("func", "N1(x,[0],[1])", 0.999*Q,Q);
 	func->SetParName(0,"m_nu");
-	func->SetParameter(0,m_nu);
-	func->SetParName(0,"C");
+	//func->SetParameter(0,m_nu);
+	func->SetParName(1,"C");
 	func->SetLineColor(2);	// red
 
 	// ROOT rootfile (will contain all histograms)
