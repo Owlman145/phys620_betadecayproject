@@ -29,7 +29,7 @@ const double m_2 = 3.0160293;	// Isotope mass (in atomic mass  units)
 
 // Other parameters
 const int charge = -1;
-const float Q = 931.5*(m_1-m_2);
+const float Q = 931.5e6*(m_1-m_2);
 const int nevents = 1e5;// Number of events to generate
 const float h = 3; // Constant used for Von Neuman method. Should range about [1,10]. Too low => cutting distribution, Too high => execution takes too long. Used to estimate the maximum of N(T_e)
 float limit=0;	// Multiple of Q over which we necessitate the energy to be
@@ -39,10 +39,10 @@ const int ndivisions = 100;	// Number of divisions in energy histograms
 // Physical Constants
 const double Pi = 3.14159265;	// Pi
 const double alpha = 1./137;	// Structure constant
-const float m_p = 938.272046;	// Mass (in MeV) of proton. From Wikipedia.
-const float m_n = 939.5654133;	// Mass (in MeV) of neutron. From Wikipedia.
-const float m_e = 0.511;	// Mass (in MeV) of electron. From Wikipedia.
-const float m_nu= 2e-6;	// Mass (in MEV) of neutrino. Value was given in our project synopsis
+const float m_p = 938.272046e6;	// Mass (in eV) of proton. From Wikipedia.
+const float m_n = 939.5654133e6;	// Mass (in eV) of neutron. From Wikipedia.
+const float m_e = 0.511e6;	// Mass (in eV) of electron. From Wikipedia.
+const float m_nu= 2;	// Mass (in MEV) of neutrino. Value was given in our project synopsis
 
 // Functions
 float N(float, float, float);		// Distribution of energy, N(T_e)
@@ -58,12 +58,12 @@ void bdecay(){
 	TRandom3 *rand = new TRandom3(time(0));	// Generate a random number generator for TRandom3
 
 	// ROOT Histograms
-	TH1D *E_e = new TH1D("E_{e}", ";E_{e} [MeV];Intensity", ndivisions, limit, Q);	// Energy histogram for electron
+	TH1D *E_e = new TH1D("E_{e}", ";E_{e} [eV];Intensity", ndivisions, limit, Q);	// Energy histogram for electron
 
 	// ROOT fit function
-	TF1 *func = new TF1("func", "N1(x,[0],[1])", 0.999*Q,Q);
+	TF1 *func = new TF1("func", "N(x,[0],[1])", 0,Q);
 	func->SetParName(0,"m_nu");
-	//func->SetParameter(0,m_nu);
+	func->SetParameter(0,2);
 	func->SetParName(1,"C");
 	func->SetLineColor(2);	// red
 
@@ -71,7 +71,7 @@ void bdecay(){
 	TFile *rootfile = new TFile("beta_decay_histograms.root", "recreate");
 
 	cout << "(Generating 1e" << log10(1.*nevents) << " events...)\n";
-	cout << "Q = " << Q << " MeV\n";
+	cout << "Q = " << Q << " eV\n";
 
 	int counter=0;	// Counter for the while loop
 	while (counter < nevents) {
@@ -103,11 +103,11 @@ float N(float T_e, float m_nu, float C)
 	return C*sqrt( pow(T_e,2) + 2*T_e*m_e ) * (T_e + m_e) * (Q-T_e) * sqrt( pow(Q-T_e,2) - pow(m_nu,2) ) * F(Z_2,T_e, charge); // Supposing C=1, taken from http://www2.warwick.ac.uk/fac/sci/physics/research/epp/exp/detrd/amber/betaspectrum/ 
 }
 
-// Energy distribution for beta decay
-float N1(float T_e, float m_nu, float C)
-{
-	return C*sqrt( pow(T_e,2) + 2*T_e*m_e ) * (T_e + m_e) * (Q-T_e) * sqrt( pow(Q-T_e,2) - pow(m_nu,2) ) * F(Z_2,T_e, charge); // Supposing C=1, taken from http://www2.warwick.ac.uk/fac/sci/physics/research/epp/eT_ep/detrd/amber/betaspectrum/ 
-}
+//// Energy distribution for beta decay
+//float N1(float T_e, float m_nu, float C)
+//{
+//	return C*sqrt( pow(T_e,2) + 2*T_e*m_e ) * (T_e + m_e) * (Q-T_e) * sqrt( pow(Q-T_e,2) - pow(m_nu,2) ) * F(Z_2,T_e, charge); // Supposing C=1, taken from http://www2.warwick.ac.uk/fac/sci/physics/research/epp/eT_ep/detrd/amber/betaspectrum/ 
+//}
 
 // Fermi function
 float F(int Z_2, float T_e, int charge)
