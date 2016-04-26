@@ -30,7 +30,7 @@ const double m_2 = 3.0160293;	// Isotope mass (in atomic mass  units)
 // Other parameters
 const int charge = -1;
 const float Q = 931.5e6*(m_1-m_2);
-const int nevents = 1e7;// Number of events to generate
+const int nevents = 1e5;// Number of events to generate
 const float h = 0.001; // Constant used for Von Neuman method. Should range about [1,10]. Too low => cutting distribution, Too high => execution takes too long. Used to estimate the maximum of N(T_e)
 float limit=0.99;	// Multiple of Q over which we necessitate the energy to be
 const int ndivisions = 100;	// Number of divisions in energy histograms
@@ -59,6 +59,14 @@ void bdecay(){
 
 	// ROOT Histograms
 	TH1D *E_e = new TH1D("E_{e}", ";E_{e} [eV];Intensity", ndivisions, limit, Q);	// Energy histogram for electron
+	E_e->SetName("E_e");
+
+	// ROOT fit function
+	TF1 *func = new TF1("func", "N(x,[0],[1])", 0,Q);
+	func->SetParName(0,"m_nu");
+	func->SetParameter(0,1);
+	func->SetParName(1,"C");
+	func->SetLineColor(2);	// red
 
 	cout << "Enter the name of the rootfile you will output (e.g. b_decay_histo): ";
 	string filename;
@@ -86,7 +94,12 @@ void bdecay(){
 			}
 		}
 	}
+
 	E_e->Write();	// Save histogram into the rootfile
+	//TCanvas *c1=new TCanvas("E_e","E_e");	// ROOT canvas creation
+	//E_e->Fit("func","");
+	//E_e->SetFillColor(4);	//blue
+	//E_e->Draw();	// Draw histogram
 }
 
 // Energy distribution for beta decay
@@ -94,6 +107,12 @@ float N(float T_e, float m_nu, float C)
 {
 	return C*sqrt( pow(T_e,2) + 2*T_e*m_e ) * (T_e + m_e) * (Q-T_e) * sqrt( pow(Q-T_e,2) - pow(m_nu,2) ) * F(Z_2,T_e, charge); // Supposing C=1, taken from http://www2.warwick.ac.uk/fac/sci/physics/research/epp/exp/detrd/amber/betaspectrum/ 
 }
+
+//// Energy distribution for beta decay
+//float N1(float T_e, float m_nu, float C)
+//{
+//	return C*sqrt( pow(T_e,2) + 2*T_e*m_e ) * (T_e + m_e) * (Q-T_e) * sqrt( pow(Q-T_e,2) - pow(m_nu,2) ) * F(Z_2,T_e, charge); // Supposing C=1, taken from http://www2.warwick.ac.uk/fac/sci/physics/research/epp/eT_ep/detrd/amber/betaspectrum/ 
+//}
 
 // Fermi function
 float F(int Z_2, float T_e, int charge)
