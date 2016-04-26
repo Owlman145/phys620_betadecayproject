@@ -30,9 +30,9 @@ const double m_2 = 3.0160293;	// Isotope mass (in atomic mass  units)
 // Other parameters
 const int charge = -1;
 const float Q = 931.5e6*(m_1-m_2);
-const int nevents = 1e5;// Number of events to generate
-const float h = 3; // Constant used for Von Neuman method. Should range about [1,10]. Too low => cutting distribution, Too high => execution takes too long. Used to estimate the maximum of N(T_e)
-float limit=0;	// Multiple of Q over which we necessitate the energy to be
+const int nevents = 1e7;// Number of events to generate
+const float h = 0.001; // Constant used for Von Neuman method. Should range about [1,10]. Too low => cutting distribution, Too high => execution takes too long. Used to estimate the maximum of N(T_e)
+float limit=0.99;	// Multiple of Q over which we necessitate the energy to be
 const int ndivisions = 100;	// Number of divisions in energy histograms
 ////////////////// End Of Parameters ///////////////
 
@@ -59,7 +59,6 @@ void bdecay(){
 
 	// ROOT Histograms
 	TH1D *E_e = new TH1D("E_{e}", ";E_{e} [eV];Intensity", ndivisions, limit, Q);	// Energy histogram for electron
-	E_e->SetName("E_e");
 
 	// ROOT fit function
 	TF1 *func = new TF1("func", "N(x,[0],[1])", 0,Q);
@@ -68,8 +67,12 @@ void bdecay(){
 	func->SetParName(1,"C");
 	func->SetLineColor(2);	// red
 
+	cout << "Enter the name of the rootfile you will output (e.g. b_decay_histo): ";
+	string filename;
+	cin >> filename;
+
 	// ROOT rootfile (will contain all histograms)
-	TFile *rootfile = new TFile("beta_decay_histograms.root", "recreate");
+	TFile *rootfile = new TFile((filename + ".root").c_str(), "recreate");
 
 	cout << "(Generating 1e" << log10(1.*nevents) << " events...)\n";
 	cout << "Q = " << Q << " eV\n";
