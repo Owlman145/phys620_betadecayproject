@@ -63,7 +63,8 @@ void bdecay2(){
 	// ROOT fit function
 	TF1 *func = new TF1("func", "N(x,[0],[1])", 0,Q);
 	func->SetParName(0,"m_nu");
-	func->SetParameter(0,2);	// We search around a m_nu mass of 2eV (find articles that cite this as upper neutrino mass)
+	func->SetParameter(0,0.3);	// We search around a m_nu mass upper-bounded by 0.3eV (find articles that cite this as upper neutrino mass)
+	//func->SetParLimits(0,0.05,0.3);	// From articles (see bibliography of Jack's article), they estimate the mass to be between 0.05 and 0.3eV)
 	func->SetParName(1,"C");
 	func->SetLineColor(2);	// red
 
