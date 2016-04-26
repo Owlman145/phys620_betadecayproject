@@ -31,9 +31,9 @@ const double m_2 = 3.0160293;	// Isotope mass (in atomic mass  units)
 // Other parameters
 const int charge = -1;
 const float Q = 931.5e6*(m_1-m_2);
-const int nevents = 1e7;// Number of events to generate
-const float h = 3; // Constant used for Von Neuman method. Should range about [1,10]. Too low => cutting distribution, Too high => execution takes too long. Used to estimate the maximum of N(T_e)
-float limit=0;	// Multiple of Q over which we necessitate the energy to be
+//const int nevents = 1e7;// Number of events to generate
+//const float h = 3; // Constant used for Von Neuman method. Should range about [1,10]. Too low => cutting distribution, Too high => execution takes too long. Used to estimate the maximum of N(T_e)
+//float limit=0;	// Multiple of Q over which we necessitate the energy to be
 const int ndivisions = 100;	// Number of divisions in energy histograms
 ////////////////// End Of Parameters ///////////////
 
