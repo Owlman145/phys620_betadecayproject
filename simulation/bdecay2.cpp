@@ -48,24 +48,22 @@ float F(int, float, int);	// Fermi function, F(Z',T_e)
 
 // Main program
 void bdecay2(){
-	limit= limit*Q;	// Limit above which we want our spectrum
-
 	gStyle->SetOptStat("nemr");	// Makes statistics box appear automatically in histograms
 
-	cout << "Enter the name of the rootfile you will load (e.g. b_decay_histo.root): ";
+	cout << "Enter the name of the rootfile you will load (e.g. b_decay_histo): ";
 	string filename;
 	cin >> filename;
 
 	// ROOT rootfile (will contain all histograms)
-	TFile *rootfile = new TFile(filename.c_str(), "read");
+	TFile *rootfile = new TFile((filename + ".root").c_str(), "read");
 
 	// ROOT Histograms
-	TH1D *E_e = (TH1D*)rootfile->Get("E_{e}");
+	TH1D *E_e = (TH1D*)rootfile->Get("E_e");
 
 	// ROOT fit function
 	TF1 *func = new TF1("func", "N(x,[0],[1])", 0,Q);
 	func->SetParName(0,"m_nu");
-	func->SetParameter(0,1);
+	func->SetParameter(0,2);	// We search around a m_nu mass of 2eV (find articles that cite this as upper neutrino mass)
 	func->SetParName(1,"C");
 	func->SetLineColor(2);	// red
 
