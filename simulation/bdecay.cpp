@@ -69,7 +69,7 @@ void bdecay(){
 	func->SetLineColor(2);	// red
 
 	// ROOT rootfile (will contain all histograms)
-	TFile *rootfile = new TFile("beta_decay_histograms_3e7.root", "recreate");
+	TFile *rootfile = new TFile("beta_decay_histograms.root", "recreate");
 
 	cout << "(Generating 1e" << log10(1.*nevents) << " events...)\n";
 	cout << "Q = " << Q << " eV\n";
