@@ -42,7 +42,7 @@ const double alpha = 1./137;	// Structure constant
 const float m_p = 938.272046e6;	// Mass (in eV) of proton. From Wikipedia.
 const float m_n = 939.5654133e6;	// Mass (in eV) of neutron. From Wikipedia.
 const float m_e = 0.511e6;	// Mass (in eV) of electron. From Wikipedia.
-const float m_nu= 2;	// Mass (in MEV) of neutrino. Value was given in our project synopsis
+const float m_nu= 0.2;	// Mass (in eV) of neutrino. Value was given in our project synopsis
 
 // Functions
 float N(float, float, float);		// Distribution of energy, N(T_e)
@@ -59,16 +59,17 @@ void bdecay(){
 
 	// ROOT Histograms
 	TH1D *E_e = new TH1D("E_{e}", ";E_{e} [eV];Intensity", ndivisions, limit, Q);	// Energy histogram for electron
+	E_e->SetName("E_e");
 
 	// ROOT fit function
 	TF1 *func = new TF1("func", "N(x,[0],[1])", 0,Q);
 	func->SetParName(0,"m_nu");
-	func->SetParameter(0,2);
+	func->SetParameter(0,1);
 	func->SetParName(1,"C");
 	func->SetLineColor(2);	// red
 
 	// ROOT rootfile (will contain all histograms)
-	TFile *rootfile = new TFile("beta_decay_histograms.root", "recreate");
+	TFile *rootfile = new TFile("beta_decay_histograms_3e7.root", "recreate");
 
 	cout << "(Generating 1e" << log10(1.*nevents) << " events...)\n";
 	cout << "Q = " << Q << " eV\n";
@@ -84,7 +85,7 @@ void bdecay(){
 			E_e->Fill(T_e);	// Enter electron kinetic energy in histogram to create beta decay spectrum
 
 			// For execution purposes, acts as a "progress bar"
-			if (!(++counter % (nevents/10))) {	// Add 1 to counter and take its modulo
+			if (!(++counter % (nevents/10))) {	// Add 1 to counter and take its modulo, if we finished a 10% of the job
 				cout << "Current progress: " << 100.*counter/nevents << "%"<< endl;	// Display progress
 			}
 		}
