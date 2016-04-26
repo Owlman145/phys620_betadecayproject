@@ -60,13 +60,6 @@ void bdecay(){
 	// ROOT Histograms
 	TH1D *E_e = new TH1D("E_{e}", ";E_{e} [eV];Intensity", ndivisions, limit, Q);	// Energy histogram for electron
 
-	// ROOT fit function
-	TF1 *func = new TF1("func", "N(x,[0],[1])", 0,Q);
-	func->SetParName(0,"m_nu");
-	func->SetParameter(0,1);
-	func->SetParName(1,"C");
-	func->SetLineColor(2);	// red
-
 	cout << "Enter the name of the rootfile you will output (e.g. b_decay_histo): ";
 	string filename;
 	cin >> filename;
@@ -93,12 +86,7 @@ void bdecay(){
 			}
 		}
 	}
-
 	E_e->Write();	// Save histogram into the rootfile
-	TCanvas *c1=new TCanvas("E_e","E_e");	// ROOT canvas creation
-	E_e->Fit("func","");
-	E_e->SetFillColor(4);	//blue
-	E_e->Draw();	// Draw histogram
 }
 
 // Energy distribution for beta decay
@@ -106,12 +94,6 @@ float N(float T_e, float m_nu, float C)
 {
 	return C*sqrt( pow(T_e,2) + 2*T_e*m_e ) * (T_e + m_e) * (Q-T_e) * sqrt( pow(Q-T_e,2) - pow(m_nu,2) ) * F(Z_2,T_e, charge); // Supposing C=1, taken from http://www2.warwick.ac.uk/fac/sci/physics/research/epp/exp/detrd/amber/betaspectrum/ 
 }
-
-//// Energy distribution for beta decay
-//float N1(float T_e, float m_nu, float C)
-//{
-//	return C*sqrt( pow(T_e,2) + 2*T_e*m_e ) * (T_e + m_e) * (Q-T_e) * sqrt( pow(Q-T_e,2) - pow(m_nu,2) ) * F(Z_2,T_e, charge); // Supposing C=1, taken from http://www2.warwick.ac.uk/fac/sci/physics/research/epp/eT_ep/detrd/amber/betaspectrum/ 
-//}
 
 // Fermi function
 float F(int Z_2, float T_e, int charge)
