@@ -2,7 +2,7 @@
 // Toy Monte Carlo Simulation of the beta decay detector
 // Uses a pre-existing beta decay spectrum
 //
-// To run, do "root -l bdecay.cpp"
+// To run, do "root -l bdecay2.cpp"
 // Make sure you set up your Xterminal so that the graph can be displayed on your screen
 //********************************************************************
 
