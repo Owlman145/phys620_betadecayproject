@@ -30,10 +30,10 @@ const double m_2 = 3.0160293;	// Isotope mass (in atomic mass  units)
 // Other parameters
 const int charge = -1;
 const float Q = 931.5e6*(m_1-m_2);
-const int nevents = 1e7;// Number of events to generate
+const int nevents = 3e7;// Number of events to generate
 const float res = 395;	// Resolution of detector (in eV)
-const float h = 3;	// Constant used for Von Neuman method. Should range about [1,10]. Too low => cutting distribution, Too high => execution takes too long. Used to estimate the maximum of N(T_e)
-float limit=0;	// Number between 0 and 1. Fraction of Q over which we necessitate the energy to be 
+const float h = 0.2;	// Constant used for Von Neuman method. Should range about [1,10]. Too low => cutting distribution, Too high => execution takes too long. Used to estimate the maximum of N(T_e)
+float limit=0.8;	// Number between 0 and 1. Fraction of Q over which we necessitate the energy to be 
 const int ndivisions = 100;	// Number of divisions in energy histograms
 ////////////////// End Of Parameters ///////////////
 
@@ -83,8 +83,12 @@ void bdecay(string filename){
 			E_e_sm->Fill(T_e_sm);	// Enter smeared electron kinetic energy in histogram to create beta decay spectrum
 
 			// For execution purposes, acts as a "progress bar"
-			if (!(++counter % (nevents/10))) {	// Add 1 to counter and take its modulo, if we finished a 10% of the job
-				cout << "Current progress: " << 100.*counter/nevents << "%"<< endl;	// Display progress
+			if (!(++counter % (nevents/100))) {	// Add 1 to counter and take its modulo, if we finished a 10% of the job
+				cout << "Current progress: ";
+				cout << 100.*counter/nevents << "%"<< endl;	// Display progress
+				if (!(counter % (nevents/10))) {
+					cout << "-----";	// Output "-----" every 10% events
+				}
 			}
 		}
 	}
@@ -95,4 +99,12 @@ void bdecay(string filename){
 // Energy distribution for beta decay
 float N(float T_e, float m_nu, float C)
 {
-	return C*sqrt( pow(T_e,2) + 2*T_e*m_e ) * (T_e + m_e) * (Q-T_e) * sqrt( pow(Q-T_e,2) - pow(m_nu,2) ) * F(Z_2,T_e, charge); // Supposing C=1, taken from http://www2.warwick.ac.uk/fac/sci/physics/research/epp/exp/detrd/amber/betas
+	return C*sqrt( pow(T_e,2) + 2*T_e*m_e ) * (T_e + m_e) * (Q-T_e) * sqrt( pow(Q-T_e,2) - pow(m_nu,2) ) * F(Z_2,T_e, charge); // Supposing C=1, taken from http://www2.warwick.ac.uk/fac/sci/physics/research/epp/exp/detrd/amber/betaspectrum/ 
+}
+
+// Fermi function
+float F(int Z_2, float T_e, int charge)
+{
+	float eta = (T_e + m_e) * charge * alpha * Z_1 / sqrt(2*T_e*m_e);	// Taken from https://en.wikipedia.org/wiki/Beta_decay#Fermi_function
+	return 2. * Pi * eta / (1 - exp(-2*Pi*eta)); // Taken from https://en.wikipedia.org/wiki/Beta_decay#Fermi_function
+}
