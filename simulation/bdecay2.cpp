@@ -47,18 +47,15 @@ float N(float, float, float);		// Distribution of energy, N(T_e)
 float F(int, float, int);	// Fermi function, F(Z',T_e)
 
 // Main program
-void bdecay2(){
+void bdecay2(string filename){
 	gStyle->SetOptStat("nemr");	// Makes statistics box appear automatically in histograms
-
-	cout << "Enter the name of the rootfile you will load (e.g. b_decay_histo): ";
-	string filename;
-	cin >> filename;
 
 	// ROOT rootfile (will contain all histograms)
 	TFile *rootfile = new TFile((filename + ".root").c_str(), "read");
 
 	// ROOT Histograms
 	TH1D *E_e = (TH1D*)rootfile->Get("E_e");
+	TH1D *E_e_sm = (TH1D*)rootfile->Get("E_e_sm");
 
 	// ROOT fit function
 	TF1 *func = new TF1("func", "N(x,[0],[1])", 0,Q);
@@ -72,6 +69,11 @@ void bdecay2(){
 	E_e->Fit("func","");
 	E_e->SetFillColor(4);	//blue
 	E_e->Draw();	// Draw histogram
+
+	TCanvas *c2=new TCanvas("E_e_sm","E_e_sm");	// ROOT canvas creation
+	E_e_sm->Fit("func","");
+	E_e_sm->SetFillColor(3);	// green
+	E_e_sm->Draw();	// Draw histogram
 }
 
 // Energy distribution for beta decay
